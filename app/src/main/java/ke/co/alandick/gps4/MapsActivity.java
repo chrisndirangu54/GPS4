@@ -296,6 +296,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
        // Toast.makeText(context, "::::NEW REQUEST:::", Toast.LENGTH_SHORT).show();
         latitudesArray.add(latitude);
         longitudesArray.add(longitude);
+        //hello
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
       //  Toast.makeText(context, "LATLNG::***:::" + latLng.toString(), Toast.LENGTH_SHORT).show();
