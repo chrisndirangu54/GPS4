@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">GPS4</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="schedule">Schedule</string>
+    <string name="weight">Weight</string>
+    <string name="map">Map</string>
+    <string name="exit">Exit</string>
+    <string name="action_settings">Settings</string>
+</resources>
