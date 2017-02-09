@@ -43,12 +43,19 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
 import cz.msebera.android.httpclient.Header;
+
+/**
+ * This class is typically the main activity class.
+ * Displays the initial look after app loads---shows a google map that
+ * updates the location as the user moves.
+ * ---Also has a tool bar with main user actions.
+ * created by Dennis Mutegi AKA cisco
+ */
 
 @RequiresApi(api = Build.VERSION_CODES.N)
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,
