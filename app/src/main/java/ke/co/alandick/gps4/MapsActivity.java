@@ -54,7 +54,7 @@ import cz.msebera.android.httpclient.Header;
  * Displays the initial look after app loads---shows a google map that
  * updates the location as the user moves.
  * ---Also has a tool bar with main user actions.
- * created by Dennis Mutegi AKA cisco
+ * created by Dennis Mutegi AKA cisco hello threre
  */
 
 @RequiresApi(api = Build.VERSION_CODES.N)
