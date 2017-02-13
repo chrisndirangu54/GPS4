@@ -6,10 +6,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -22,30 +19,21 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
-import java.io.BufferedReader;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 import cz.msebera.android.httpclient.Header;
 
 
 /**
- * Created by Nyagaka Enock on 1/16/2017.
+ * Created cisco dennis.
  */
 
 public class GPSTracker extends Service implements LocationListener {
-
-
-
 
     private final Context mContext;
 
@@ -75,11 +63,6 @@ public class GPSTracker extends Service implements LocationListener {
     String tmpplat = "";
     String tmpLon = "";
 
-    // The minimum distance to change Updates in meters
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0; // 1 meters
-
-    // The minimum time between updates in milliseconds
-    private static final long MIN_TIME_BW_UPDATES = 1000 * 30; // 5 seconds
 
     // Declaring a Location Manager
     protected LocationManager locationManager;
@@ -105,7 +88,7 @@ public class GPSTracker extends Service implements LocationListener {
                 this.canGetLocation = true;
                 // First get location from Network Provider
                 if (isNetworkEnabled) {
-                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, GlobalConstants.delay, GlobalConstants.MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
                     Log.d("Network", "Network");
                     if (locationManager != null) {
                         location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
@@ -123,7 +106,7 @@ public class GPSTracker extends Service implements LocationListener {
                                 ContextCompat.checkSelfPermission( mContext, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                             //// return  ;
                         }
-                        locationManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                        locationManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, GlobalConstants.delay, GlobalConstants.MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
                         Log.d("GPS Enabled", "GPS Enabled");
                         if (locationManager != null) {
                             location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -233,6 +216,9 @@ public class GPSTracker extends Service implements LocationListener {
         Double longitude = location.getLongitude();
         String sendDate = mapsActivity.dateFormater.format(new Date());
 
+       // mapsActivity.deviceId = Settings.Secure.getString(this.getContentResolver(),
+             //   Settings.Secure.ANDROID_ID);
+
 
 
         Toast.makeText(mContext, "GPS TRACKER ::: " + location.toString(), Toast.LENGTH_SHORT).show();
@@ -258,15 +244,16 @@ public class GPSTracker extends Service implements LocationListener {
         requestParams.put("driverCarId", "AF20002A-26CC-44EA-A418-4FBC637AB702");
         requestParams.put("sendDate", sendDate);
         requestParams.put("factoryId", "E265CF3A-1288-4516-9E54-572A8F1E6FC4");
+        requestParams.put("deviceId", MapsActivity.deviceId);
 
-        String BASE_URL = "http://3c1dc758.ngrok.io/CarTracker/geoLocation?";
-        //BASE_URL = "https://www.google.com/";
+        Toast.makeText(mContext, "device id:::" + MapsActivity.deviceId, Toast.LENGTH_SHORT).show();
+
         Log.i("MAP", "***********************************************onSuccess: " + "DENNIS1");
 
 
         Toast.makeText(mContext, "Sending request number ::::" + mapsActivity.sendCount, Toast.LENGTH_SHORT).show();
         mapsActivity.sendCount ++;
-        asyncHttpClient.get(BASE_URL, requestParams, new AsyncHttpResponseHandler() {
+        asyncHttpClient.get(GlobalConstants.endpoint, requestParams, new AsyncHttpResponseHandler() {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
@@ -282,48 +269,6 @@ public class GPSTracker extends Service implements LocationListener {
                 Log.i("MAP", "***********************************************onSuccess: " + "DENNIS3");
             }
         });
-
-
-    }
-
-    class SendToServer extends AsyncTask<String,String,String> {
-
-        String tmpLat = "";
-        String tmpLon = "";
-
-
-        @Override
-        protected String doInBackground(String... la ) {
-
-            try {
-
-                Log.i("string" , la[0]);
-                String longi = la[0];
-                String lati = la[1];
-
-
-
-                Toast.makeText(mContext, "lat:::" + lati + ":::lon:::" + longi, Toast.LENGTH_SHORT).show();
-
-                if(tmpLat.equalsIgnoreCase(lati) && tmpLon.equalsIgnoreCase(longi)){
-                    Toast.makeText(mContext, "****INVALID***", Toast.LENGTH_SHORT).show();
-                }
-                else{
-                    Toast.makeText(mContext, "VALID", Toast.LENGTH_SHORT).show();
-                }
-
-                // Building Parameters
-                Log.d("value", lati);
-                Log.d("value", longi);
-
-
-            } catch (Exception e) {
-                Log.i("error", e.toString());
-            }
-
-            return "call";
-        }
-
 
 
     }

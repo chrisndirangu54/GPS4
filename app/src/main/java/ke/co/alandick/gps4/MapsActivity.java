@@ -12,6 +12,7 @@ import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -54,7 +55,7 @@ import cz.msebera.android.httpclient.Header;
  * Displays the initial look after app loads---shows a google map that
  * updates the location as the user moves.
  * ---Also has a tool bar with main user actions.
- * created by Dennis Mutegi AKA cisco hello threre
+ * created by Dennis Mutegi AKA cisco
  */
 
 @RequiresApi(api = Build.VERSION_CODES.N)
@@ -77,12 +78,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     int sendCount = 0;
     String tmpLatitude = "0.0";
 
-    Location location = null;
-    long HANDLER_DELAY = 10;
-
-    private Handler handler = new Handler();
-    String successResponse = "";
-    String failResponse = "";
 
     //track already visited locations
     ArrayList<String> latitudesArray = new ArrayList<>();
@@ -96,26 +91,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     LatLng newLatln = null;
 
-
-    private Runnable runnable = new Runnable() {
-        public void run() {
-            if (location != null && context != null) {
-
-                Log.d("LOGS", "***LOCATION VALUE" + location.toString());
-               // Toast.makeText(context, "Sending ... *****", Toast.LENGTH_SHORT).show();
-
-
-                //onLocationChanged(location);
-                //Toast.makeText(context, "LATLNG::::::new ones" + newLatln.toString(), Toast.LENGTH_SHORT).show();
-
-              //  Toast.makeText(context, "#######:::" + returnLocation().toString() , Toast.LENGTH_SHORT).show();
-
-            }
-
-          //  handler.postDelayed(this, HANDLER_DELAY);
-        }
-    };
-
+    public static String deviceId = "000000";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,6 +103,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.actionbar_background)));
         getSupportActionBar().setIcon(R.drawable.logoreal);
         getSupportActionBar().setTitle("");
+
+        deviceId = Settings.Secure.getString(this.getContentResolver(),
+                Settings.Secure.ANDROID_ID);
+
+        Toast.makeText(this, deviceId, Toast.LENGTH_SHORT).show();
+
         context = this;
 
 
@@ -260,12 +242,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 == PackageManager.PERMISSION_GRANTED) {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
 
-
-            Log.d("GPS Enabled", "GPS Enabled");
-            if (locationManager != null) {
-                location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            }
-
         }
     }
 
@@ -281,32 +257,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         Toast.makeText(context, "***** YOU CANT USE ME ****", Toast.LENGTH_SHORT).show();
 
-        //Toast.makeText(context, location.toString(), Toast.LENGTH_SHORT).show();
-        mLastLocation = location;
-        this.location = location;
+
         if (mCurrLocationMarker != null) {
             mCurrLocationMarker.remove();
         }
 
-        //Place current location marker
-        //Toast.makeText(this,"Latitude:::" + location.getLatitude() ,Toast.LENGTH_LONG);
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         newLatln = latLng;
         latitude = String.valueOf(location.getLatitude());
         longitude = String.valueOf(location.getLongitude());
 
-        //check if co-ordinate already sent
-        if(latitudesArray.contains(latitude) && longitudesArray.contains(longitude)){
-           // Toast.makeText(context, ":::::REQUEST ALREADY SENT::::", Toast.LENGTH_SHORT).show();
-            return;
-        }
-       // Toast.makeText(context, "::::NEW REQUEST:::", Toast.LENGTH_SHORT).show();
-        latitudesArray.add(latitude);
-        longitudesArray.add(longitude);
-        //hello
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
-      //  Toast.makeText(context, "LATLNG::***:::" + latLng.toString(), Toast.LENGTH_SHORT).show();
         markerOptions.title("Current Position");
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
         mCurrLocationMarker = mMap.addMarker(markerOptions);
@@ -321,14 +283,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
 
-        if(netIsAvailable()) {
-          //  Toast.makeText(this, "Sending ...LAT:::" + location.getLatitude() + "***LONG***" + location.getLongitude(), Toast.LENGTH_SHORT).show();
-           // serverSendParams(location.getLatitude(), location.getLongitude());
-        }
-        else{
 
-            Toast.makeText(this, "Internet not available" , Toast.LENGTH_LONG);
-        }
         //stop location updates
         if (mGoogleApiClient != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
